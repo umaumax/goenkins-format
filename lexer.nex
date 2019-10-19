@@ -1,0 +1,74 @@
+/[ \t]/ { /* skip */ }
+/\n/ { TrimSpace(); Output(0, "\n");outputNewFlag=true; return NR }
+
+/def|new|if|else|sh|echo|import|agent|label|script|environment|stage|node|dir|any|none/ {
+  m := map[string]int{
+    "def" : DEF,
+    "new" : NEW,
+    "if" : IF,
+    "else" : ELSE,
+    "sh" : SH,
+    "echo": ECHO,
+    "import": IMPORT,
+    "agent": AGENT,
+    "label": LABEL,
+    "script": SCRIPT,
+    "environment": ENVIRONMENT,
+    "stage": STAGE,
+    "node": NODE,
+    "dir": DIR,
+    "any": ANY,
+    "none": NONE,
+  }
+  Output(lval.indent_level,yylex.Text()," "); return m[yylex.Text()]
+}
+
+/==|!=|>=|<=|\|\||&&/ {
+  m := map[string]int{
+    "==" : EQ,
+    "!=" : NE,
+    ">=" : GE,
+    "<=" : LE,
+    "||" : OR,
+    "&&" : AND,
+  }
+  Output(lval.indent_level,yylex.Text()," "); return m[yylex.Text()]
+}
+
+/{/ { lval.indent_level++; Output(lval.indent_level,yylex.Text()," "); return int(yylex.Text()[0]) }
+/}/ { lval.indent_level--; Output(lval.indent_level,yylex.Text()," "); return int(yylex.Text()[0]) }
+
+/[;{}=+%\/\-]|<|>/ { Output(lval.indent_level, yylex.Text()," "); return int(yylex.Text()[0]) }
+/[(.]|\[/ {
+  c := yylex.Text()[0]
+  if c == '(' || c=='[' {
+    lval.indent_level++
+  }
+  TrimSpace(); Output(lval.indent_level, yylex.Text())
+  return int(c)
+}
+/[:,]|\)|\]/ {
+  c := yylex.Text()[0]
+  if c == ')' || c == ']' {
+    lval.indent_level--
+  }
+  TrimSpace(); Output(lval.indent_level, yylex.Text(), " ")
+  return int(yylex.Text()[0])
+}
+
+/[a-zA-Z0-9$_]+/ { Output(lval.indent_level, yylex.Text()," "); lval.str = yylex.Text(); return IDENT }
+
+/\/\/[^\n]*\n/ { Output(lval.indent_level, yylex.Text()); outputNewFlag=true; return NR }
+/\/\*([^\/]|[^*]\/)*\*\// { Output(lval.indent_level, yylex.Text()) }
+
+/'''([^']|'[^']|''[^'])*'''/ { Output(lval.indent_level, yylex.Text()," "); lval.str = yylex.Text(); return STRING }
+/"""([^"]|"[^"]|""[^"])*"""/ { Output(lval.indent_level, yylex.Text()," "); lval.str = yylex.Text(); return STRING }
+/'[^']*'/ { Output(lval.indent_level, yylex.Text()," "); return STRING }
+/"([^"]|\\[^"])*"/ { Output(lval.indent_level, yylex.Text()," "); return STRING }
+
+//
+/* NOTE: high priority */
+/* NOTE: low priority */
+package main
+import (
+)
