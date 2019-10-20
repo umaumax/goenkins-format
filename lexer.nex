@@ -1,6 +1,10 @@
 /[ \t]/ { /* skip */ }
-/\n/ { outputStream.TrimSpace(); outputStream.Output(0, "\n");outputStream.SetNewLineFlag(); return NR }
-
+/\n/ {
+  outputStream.TrimSpace()
+  outputStream.Write(0, "\n")
+  outputStream.SetNewLineFlag()
+  return NR
+}
 /def|new|if|else|sh|echo|import|agent|label|script|environment|stage|node|dir|any|none/ {
   m := map[string]int{
     "def" : DEF,
@@ -20,7 +24,8 @@
     "any": ANY,
     "none": NONE,
   }
-  outputStream.Output(lval.indent_level,yylex.Text()," "); return m[yylex.Text()]
+  outputStream.Write(lval.indent_level,yylex.Text()," ")
+  return m[yylex.Text()]
 }
 
 /==|!=|>=|<=|\|\||&&/ {
@@ -32,19 +37,33 @@
     "||" : OR,
     "&&" : AND,
   }
-  outputStream.Output(lval.indent_level,yylex.Text()," "); return m[yylex.Text()]
+  outputStream.Write(lval.indent_level,yylex.Text()," ")
+  return m[yylex.Text()]
 }
 
-/{/ { lval.indent_level++; outputStream.Output(lval.indent_level,yylex.Text()," "); return int(yylex.Text()[0]) }
-/}/ { lval.indent_level--; outputStream.Output(lval.indent_level,yylex.Text()," "); return int(yylex.Text()[0]) }
+/{|}/ {
+  c := yylex.Text()[0]
+  if c == '{' {
+    lval.indent_level++
+  }
+  if c == '}' {
+    lval.indent_level--
+  }
+  outputStream.Write(lval.indent_level,yylex.Text()," ")
+  return int(c)
+}
 
-/[;{}=+%\/\-]|<|>/ { outputStream.Output(lval.indent_level, yylex.Text()," "); return int(yylex.Text()[0]) }
+/[;{}=+%\/\-]|<|>/ {
+  outputStream.Write(lval.indent_level, yylex.Text()," ")
+  return int(yylex.Text()[0])
+}
 /[(.]|\[/ {
   c := yylex.Text()[0]
   if c == '(' || c=='[' {
     lval.indent_level++
   }
-  outputStream.TrimSpace(); outputStream.Output(lval.indent_level, yylex.Text())
+  outputStream.TrimSpace()
+  outputStream.Write(lval.indent_level, yylex.Text())
   return int(c)
 }
 /[:,]|\)|\]/ {
@@ -52,23 +71,49 @@
   if c == ')' || c == ']' {
     lval.indent_level--
   }
-  outputStream.TrimSpace(); outputStream.Output(lval.indent_level, yylex.Text(), " ")
+  outputStream.TrimSpace()
+  outputStream.Write(lval.indent_level, yylex.Text(), " ")
   return int(yylex.Text()[0])
 }
 
-/[a-zA-Z0-9$_]+/ { outputStream.Output(lval.indent_level, yylex.Text()," "); lval.str = yylex.Text(); return IDENT }
+/[a-zA-Z0-9$_]+/ {
+  outputStream.Write(lval.indent_level, yylex.Text()," ")
+  lval.str = yylex.Text()
+  return IDENT
+}
 
-/\/\/[^\n]*\n/ { outputStream.Output(lval.indent_level, yylex.Text()); outputStream.SetNewLineFlag(); return NR }
-/\/\*([^\/]|[^*]\/)*\*\// { outputStream.Output(lval.indent_level, yylex.Text()) }
+/\/\/[^\n]*\n/ {
+  outputStream.Write(lval.indent_level, yylex.Text())
+  outputStream.SetNewLineFlag()
+  // NOTE: return new line value because of including \n at the end
+  return NR
+}
+/\/\*([^\/]|[^*]\/)*\*\// {
+  outputStream.Write(lval.indent_level, yylex.Text())
+  // NOTE: skipe multi line comment
+}
 
-/'''([^']|'[^']|''[^'])*'''/ { outputStream.Output(lval.indent_level, yylex.Text()," "); lval.str = yylex.Text(); return STRING }
-/"""([^"]|"[^"]|""[^"])*"""/ { outputStream.Output(lval.indent_level, yylex.Text()," "); lval.str = yylex.Text(); return STRING }
-/'[^']*'/ { outputStream.Output(lval.indent_level, yylex.Text()," "); return STRING }
-/"([^"]|\\[^"])*"/ { outputStream.Output(lval.indent_level, yylex.Text()," "); return STRING }
-
+/'''([^']|'[^']|''[^'])*'''/ {
+  outputStream.Write(lval.indent_level, yylex.Text()," ")
+  lval.str = yylex.Text()
+  return STRING
+}
+/"""([^"]|"[^"]|""[^"])*"""/ {
+  outputStream.Write(lval.indent_level, yylex.Text()," ")
+  lval.str = yylex.Text()
+  return STRING
+}
+/'[^']*'/ {
+  outputStream.Write(lval.indent_level, yylex.Text()," ")
+  return STRING
+}
+/"([^"]|\\[^"])*"/ {
+  outputStream.Write(lval.indent_level, yylex.Text()," ")
+  return STRING
+}
 //
-/* NOTE: high priority */
-/* NOTE: low priority */
+/* NOTE: upper case: high priority */
+/* NOTE: upper cases: low priority */
 package main
 import (
 )

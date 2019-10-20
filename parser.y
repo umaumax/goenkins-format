@@ -1,6 +1,5 @@
 %{
 package main
-// import "fmt"
 %}
 
 %union {
@@ -27,9 +26,6 @@ package main
 %token IF ELSE
 
 // NOTE: low priority
-// NOTE: no '\n'?
-%left NR
-// %left ','
 %left OR
 %left AND
 %left '<' '>' EQ NE LE GE
@@ -115,25 +111,20 @@ package: IDENT
 exprs: /* blank */
     | expr
     | exprs ',' nop expr
-    // | exprs ',' nrs expr
-    // | exprs nop
-    // | nrs exprs
 
 key_vals: key_val
     | key_vals ',' nop key_val
-    // | key_vals ',' nrs key_val
-    // | key_vals nrs
 
 key_val: IDENT ':' expr
 
 // NOTE: 式
 expr: primary
-    // func call
     | key_vals
     | '[' nop exprs nop ']'
     | '[' nop key_vals nop ']'
     // NOTE: duplicate rule but need for func()
     | IDENT '(' exprs ')'
+    // func call
     | expr '(' exprs ')'
     | expr '(' key_vals ')'
     | '(' key_vals ')'
