@@ -129,7 +129,6 @@ key_val: IDENT ':' expr
 // NOTE: 式
 expr: primary
     // func call
-    // | '[' exprs ']'
     | key_vals
     | '[' nop exprs nop ']'
     | '[' nop key_vals nop ']'
@@ -140,7 +139,6 @@ expr: primary
     | '(' key_vals ')'
     | expr '.' IDENT
     | NEW IDENT '(' exprs ')'
-    // 演算記号
     | '-' expr %prec UNARY_OPERAND
     | expr '<' expr
     | expr '>' expr

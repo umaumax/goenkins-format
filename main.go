@@ -2,44 +2,88 @@ package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 )
 
-var output string
-var outputNewFlag bool
+var (
+	indentSapceNum int
+)
 
-func TrimSpace() {
-	output = strings.TrimRight(output, " ")
-	if strings.HasSuffix(output, "\n") {
-		output = strings.TrimRight(output, "\n") + "\n"
+func init() {
+	flag.IntVar(&indentSapceNum, "indent_num", 2, "number of spaces of indent")
+}
+
+var (
+	outputStream OutputStream
+)
+
+type OutputStream struct {
+	output         string
+	outputNewFlag  bool
+	indentSapceNum int
+}
+
+func (s *OutputStream) SetIndentSpaceNum(indentSapceNum int) {
+	s.indentSapceNum = indentSapceNum
+}
+
+func (s *OutputStream) SetNewLineFlag() {
+	s.outputNewFlag = true
+}
+
+func (s *OutputStream) TrimSpace() {
+	s.output = strings.TrimRight(s.output, " ")
+	if strings.HasSuffix(s.output, "\n") {
+		s.output = strings.TrimRight(s.output, "\n") + "\n"
 	}
 }
-func Output(indent_level int, args ...interface{}) {
-	if outputNewFlag {
-		output += fmt.Sprint(GenIndent(indent_level))
-		outputNewFlag = false
+func (s *OutputStream) Output(indent_level int, args ...interface{}) {
+	if s.outputNewFlag {
+		s.output += fmt.Sprint(s.GenIndent(indent_level))
+		s.outputNewFlag = false
 	}
 	withSpaceKeywords := []string{"if", ":"}
 	for _, v := range withSpaceKeywords {
-		if strings.HasSuffix(output, v) {
-			output += " "
+		if strings.HasSuffix(s.output, v) {
+			s.output += " "
 			break
 		}
 	}
-	output += fmt.Sprint(args...)
+	s.output += fmt.Sprint(args...)
 }
-func GenIndent(indent_level int) string {
-	// NOTE: indent space number is 2
-	return strings.Repeat("  ", indent_level)
+func (s *OutputStream) GenIndent(indent_level int) string {
+	return strings.Repeat(strings.Repeat(" ", s.indentSapceNum), indent_level)
+}
+
+func (s *OutputStream) String() string {
+	return s.output
+}
+
+type LexerWrapper struct {
+	*Lexer
+}
+
+func (yylex LexerWrapper) Error(e string) {
+	log.Println(e)
 }
 
 func main() {
-	if yyParse(NewLexer(os.Stdin)) != 0 {
-		log.Fatal(errors.New("Parse error"))
+	flag.Parse()
+
+	outputStream.SetIndentSpaceNum(indentSapceNum)
+
+	lexer := LexerWrapper{Lexer: NewLexer(os.Stdin)}
+	if yyParse(lexer) != 0 {
+		log.Println(errors.New("hint fot error"))
+		outputStream.TrimSpace()
+		fmt.Fprintln(os.Stderr, "[", outputStream.output, "]")
+		os.Exit(1)
 	}
-	TrimSpace()
-	fmt.Print(output)
+
+	outputStream.TrimSpace()
+	fmt.Print(outputStream.output)
 }

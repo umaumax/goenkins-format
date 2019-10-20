@@ -15,9 +15,9 @@ function main() {
     echo "go get -u golang.org/x/tools/cmd/goyacc"
     return 1
   fi
-  echo '[nex]'
+  echo '# [nex] processing...'
   nex lexer.nex
-  echo '[goyacc]'
+  echo '# [goyacc] processing...'
   goyacc -o paser.y.go -v parser.y.output parser.y
   go build -o goenkins-format
 }
