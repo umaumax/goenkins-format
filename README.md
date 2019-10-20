@@ -2,12 +2,20 @@
 
 jenkins declarative pipeline formatter
 
-## how to use
+## how to install
 ```
-WIP
+go get -u https://github.com/umaumax/goenkins-format
 ```
 
-## how to update codes
+## how to use
+```
+cat xxx.groovy | goenkins-format
+```
+
+----
+
+## FMI
+### how to update codes
 ```
 ./build.sh
 
@@ -16,7 +24,7 @@ WIP
 ./test.sh test/TODO_input
 ```
 
-## NOTE
+### NOTE
 * 現在，字句解析のみで対応しているが，厳密には構文解析で対応する必要がある
 * 通常，parserだとコメントはskipしても問題ない場合もあるが，formatterで構文解析でコードの出力処理の対応をする場合にはの場合にはskip不可
 * githubで検索してみても，commentが挿入される可能性のある場所すべてに入れている
@@ -40,8 +48,8 @@ xxx: /* empty */
 
 yaccでは、right recursionでは、途中の状態をスタックにとっておく必要が あるため、なるべく、left recursionで書いておくべきである。
 
-## FYI
-### jenkins
+### links
+#### jenkins
 * about jenkins file
   * [Jenkinsfileの書き方 \- Qiita]( https://qiita.com/lufia/items/18cdb01f86a6d5040c60 )
 * official pipeline syntax
@@ -51,8 +59,8 @@ yaccでは、right recursionでは、途中の状態をスタックにとって�
 * vscode linter plugin
   * [Validate your Jenkinsfile from within VS Code]( https://jenkins.io/blog/2018/11/07/Validate-Jenkinsfile/ )
 
-### yacc/lex
+#### yacc/lex
 * [anko/parser\.go\.y at master · mattn/anko]( https://github.com/mattn/anko/blob/master/parser/parser.go.y )
 
-### 構文解析時のエラーハンドリング
+#### 構文解析時のエラーハンドリング
 * [goyaccで構文解析を行う \- Qiita]( https://qiita.com/k0kubun/items/1b641dfd186fe46feb65#yyparse%E3%81%AE%E5%BC%95%E6%95%B0 )
