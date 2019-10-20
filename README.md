@@ -4,7 +4,7 @@ jenkins declarative pipeline formatter
 
 ## how to install
 ```
-go get -u https://github.com/umaumax/goenkins-format
+go get -u github.com/umaumax/goenkins-format
 ```
 
 ## how to use
@@ -43,8 +43,10 @@ xxx: /* empty */
 
 * [www\.hpcs\.cs\.tsukuba\.ac\.jp/~msato/lecture\-note/comp\-lecture/note5\.html]( http://www.hpcs.cs.tsukuba.ac.jp/~msato/lecture-note/comp-lecture/note5.html )
 
+> ```
 > seq:  item |  seq ',' term ;　/* left recursion */
 > seq:  item | term ',' seq ;   /* right recursion */
+> ```
 
 yaccでは、right recursionでは、途中の状態をスタックにとっておく必要が あるため、なるべく、left recursionで書いておくべきである。
 
