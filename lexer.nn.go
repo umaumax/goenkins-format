@@ -3207,12 +3207,14 @@ var dfas = []dfa{
 		},
 	}, []int{ /* Start-of-input transitions */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, []int{ /* End-of-input transitions */ -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}, nil},
 
-	// {
-	{[]bool{false, true}, []func(rune) int{ // Transitions
+	// {|}
+	{[]bool{false, true, true}, []func(rune) int{ // Transitions
 		func(r rune) int {
 			switch r {
 			case 123:
 				return 1
+			case 125:
+				return 2
 			}
 			return -1
 		},
@@ -3220,28 +3222,21 @@ var dfas = []dfa{
 			switch r {
 			case 123:
 				return -1
-			}
-			return -1
-		},
-	}, []int{ /* Start-of-input transitions */ -1, -1}, []int{ /* End-of-input transitions */ -1, -1}, nil},
-
-	// }
-	{[]bool{false, true}, []func(rune) int{ // Transitions
-		func(r rune) int {
-			switch r {
-			case 125:
-				return 1
-			}
-			return -1
-		},
-		func(r rune) int {
-			switch r {
 			case 125:
 				return -1
 			}
 			return -1
 		},
-	}, []int{ /* Start-of-input transitions */ -1, -1}, []int{ /* End-of-input transitions */ -1, -1}, nil},
+		func(r rune) int {
+			switch r {
+			case 123:
+				return -1
+			case 125:
+				return -1
+			}
+			return -1
+		},
+	}, []int{ /* Start-of-input transitions */ -1, -1, -1}, []int{ /* End-of-input transitions */ -1, -1, -1}, nil},
 
 	// [;{}=+%\/\-]|<|>
 	{[]bool{false, true, true, true}, []func(rune) int{ // Transitions
@@ -3927,9 +3922,9 @@ OUTER0:
 			}
 		case 1:
 			{
-				TrimSpace()
-				Output(0, "\n")
-				outputNewFlag = true
+				outputStream.TrimSpace()
+				outputStream.Write(0, "\n")
+				outputStream.SetNewLineFlag()
 				return NR
 			}
 		case 2:
@@ -3952,7 +3947,7 @@ OUTER0:
 					"any":         ANY,
 					"none":        NONE,
 				}
-				Output(lval.indent_level, yylex.Text(), " ")
+				outputStream.Write(lval.indent_level, yylex.Text(), " ")
 				return m[yylex.Text()]
 			}
 		case 3:
@@ -3965,82 +3960,84 @@ OUTER0:
 					"||": OR,
 					"&&": AND,
 				}
-				Output(lval.indent_level, yylex.Text(), " ")
+				outputStream.Write(lval.indent_level, yylex.Text(), " ")
 				return m[yylex.Text()]
 			}
 		case 4:
 			{
-				lval.indent_level++
-				Output(lval.indent_level, yylex.Text(), " ")
-				return int(yylex.Text()[0])
+				c := yylex.Text()[0]
+				if c == '{' {
+					lval.indent_level++
+				}
+				if c == '}' {
+					lval.indent_level--
+				}
+				outputStream.Write(lval.indent_level, yylex.Text(), " ")
+				return int(c)
 			}
 		case 5:
 			{
-				lval.indent_level--
-				Output(lval.indent_level, yylex.Text(), " ")
+				outputStream.Write(lval.indent_level, yylex.Text(), " ")
 				return int(yylex.Text()[0])
 			}
 		case 6:
-			{
-				Output(lval.indent_level, yylex.Text(), " ")
-				return int(yylex.Text()[0])
-			}
-		case 7:
 			{
 				c := yylex.Text()[0]
 				if c == '(' || c == '[' {
 					lval.indent_level++
 				}
-				TrimSpace()
-				Output(lval.indent_level, yylex.Text())
+				outputStream.TrimSpace()
+				outputStream.Write(lval.indent_level, yylex.Text())
 				return int(c)
 			}
-		case 8:
+		case 7:
 			{
 				c := yylex.Text()[0]
 				if c == ')' || c == ']' {
 					lval.indent_level--
 				}
-				TrimSpace()
-				Output(lval.indent_level, yylex.Text(), " ")
+				outputStream.TrimSpace()
+				outputStream.Write(lval.indent_level, yylex.Text(), " ")
 				return int(yylex.Text()[0])
 			}
-		case 9:
+		case 8:
 			{
-				Output(lval.indent_level, yylex.Text(), " ")
+				outputStream.Write(lval.indent_level, yylex.Text(), " ")
 				lval.str = yylex.Text()
 				return IDENT
 			}
+		case 9:
+			{
+				outputStream.Write(lval.indent_level, yylex.Text())
+				outputStream.SetNewLineFlag()
+				// NOTE: return new line value because of including \n at the end
+				return NR
+			}
 		case 10:
 			{
-				Output(lval.indent_level, yylex.Text())
-				outputNewFlag = true
-				return NR
+				outputStream.Write(lval.indent_level, yylex.Text())
+				// NOTE: skipe multi line comment
 			}
 		case 11:
 			{
-				Output(lval.indent_level, yylex.Text())
+				outputStream.Write(lval.indent_level, yylex.Text(), " ")
+				lval.str = yylex.Text()
+				return STRING
 			}
 		case 12:
 			{
-				Output(lval.indent_level, yylex.Text(), " ")
+				outputStream.Write(lval.indent_level, yylex.Text(), " ")
 				lval.str = yylex.Text()
 				return STRING
 			}
 		case 13:
 			{
-				Output(lval.indent_level, yylex.Text(), " ")
-				lval.str = yylex.Text()
+				outputStream.Write(lval.indent_level, yylex.Text(), " ")
 				return STRING
 			}
 		case 14:
 			{
-				Output(lval.indent_level, yylex.Text(), " ")
-				return STRING
-			}
-		case 15:
-			{
-				Output(lval.indent_level, yylex.Text(), " ")
+				outputStream.Write(lval.indent_level, yylex.Text(), " ")
 				return STRING
 			}
 		default:

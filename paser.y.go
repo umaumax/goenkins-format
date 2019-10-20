@@ -6,9 +6,8 @@ package main
 import __yyfmt__ "fmt"
 
 //line parser.y:2
-// import "fmt"
 
-//line parser.y:6
+//line parser.y:5
 type yySymType struct {
 	yys          int
 	num          int
@@ -106,7 +105,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line parser.y:166
+//line parser.y:155
 
 //line yacctab:1
 var yyExca = [...]int{
