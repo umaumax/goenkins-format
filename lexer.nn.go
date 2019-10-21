@@ -3975,8 +3975,8 @@ var dfas = []dfa{
 		},
 	}, []int{ /* Start-of-input transitions */ -1, -1, -1, -1}, []int{ /* End-of-input transitions */ -1, -1, -1, -1}, nil},
 
-	// "([^"]|\\[^"])*"
-	{[]bool{false, false, true, false, false, false, false}, []func(rune) int{ // Transitions
+	// "([^"]|\\")*"
+	{[]bool{false, false, true, false, false, true}, []func(rune) int{ // Transitions
 		func(r rune) int {
 			switch r {
 			case 34:
@@ -4007,11 +4007,11 @@ var dfas = []dfa{
 		func(r rune) int {
 			switch r {
 			case 34:
-				return 2
-			case 92:
 				return 5
+			case 92:
+				return 3
 			}
-			return 6
+			return 4
 		},
 		func(r rune) int {
 			switch r {
@@ -4027,20 +4027,11 @@ var dfas = []dfa{
 			case 34:
 				return 2
 			case 92:
-				return 5
-			}
-			return 6
-		},
-		func(r rune) int {
-			switch r {
-			case 34:
-				return 2
-			case 92:
 				return 3
 			}
 			return 4
 		},
-	}, []int{ /* Start-of-input transitions */ -1, -1, -1, -1, -1, -1, -1}, []int{ /* End-of-input transitions */ -1, -1, -1, -1, -1, -1, -1}, nil},
+	}, []int{ /* Start-of-input transitions */ -1, -1, -1, -1, -1, -1}, []int{ /* End-of-input transitions */ -1, -1, -1, -1, -1, -1}, nil},
 }
 
 func NewLexer(in io.Reader) *Lexer {

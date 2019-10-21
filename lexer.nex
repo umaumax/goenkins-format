@@ -109,7 +109,7 @@
   outputStream.Write(lval.indent_level, yylex.Text()," ")
   return STRING
 }
-/"([^"]|\\[^"])*"/ {
+/"([^"]|\\")*"/ {
   outputStream.Write(lval.indent_level, yylex.Text()," ")
   return STRING
 }

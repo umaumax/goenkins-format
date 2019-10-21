@@ -105,6 +105,8 @@ groovy_stmt: expr
   | expr '=' expr
   | IDENT groovy_block
   | ECHO expr
+  // NOTE: for other rules...
+  | IDENT expr
   | IF expr groovy_block
   | IF expr groovy_block ELSE groovy_block
   | FOR '(' IDENT IN expr ')' groovy_block
