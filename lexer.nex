@@ -53,7 +53,7 @@
   return int(c)
 }
 
-/[;{}=+%\/\-]|<|>/ {
+/[;{}=+*%\/\-]|<|>/ {
   outputStream.Write(lval.indent_level, yylex.Text()," ")
   return int(yylex.Text()[0])
 }

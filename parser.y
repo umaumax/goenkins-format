@@ -106,6 +106,7 @@ groovy_stmt: expr
 groovy_block : '{' groovy_stmts '}'
 
 package: IDENT
+    | '*'
     | IDENT '.' package
 
 exprs: /* blank */
