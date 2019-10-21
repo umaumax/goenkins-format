@@ -23,7 +23,7 @@ package main
 %token SH ECHO
 %token AGENT LABEL STAGE NODE DIR SCRIPT ENVIRONMENT
 %token IMPORT
-%token IF ELSE
+%token IF ELSE FOR IN
 
 // NOTE: low priority
 %left OR
@@ -64,6 +64,10 @@ pipeline_stmt_delimiter: EOF
 pipeline_stmt: IMPORT package
   // NOTE: for other rules...
   | expr
+  // NOTE: for other rules...
+  | DEF IDENT
+  // NOTE: for other rules...
+  | DEF IDENT '=' expr
   | expr '=' expr
   // NOTE: for other rules...
   | IDENT STRING
@@ -94,6 +98,7 @@ pipeline_block : '{' pipeline_stmts '}'
 
 groovy_stmt: expr
   | groovy_block
+  | DEF IDENT
   | DEF IDENT '=' expr
   // NOTE: for other rules...
   | IDENT IDENT '=' expr
@@ -102,6 +107,7 @@ groovy_stmt: expr
   | ECHO expr
   | IF expr groovy_block
   | IF expr groovy_block ELSE groovy_block
+  | FOR '(' IDENT IN expr ')' groovy_block
 
 groovy_block : '{' groovy_stmts '}'
 

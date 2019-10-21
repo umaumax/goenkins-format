@@ -5,7 +5,7 @@
   outputStream.SetNewLineFlag()
   return NR
 }
-/def|new|if|else|sh|echo|import|agent|label|script|environment|stage|node|dir|any|none/ {
+/def|new|if|else|sh|echo|import|agent|label|script|environment|stage|node|dir|any|none|for|in/ {
   m := map[string]int{
     "def" : DEF,
     "new" : NEW,
@@ -23,6 +23,8 @@
     "dir": DIR,
     "any": ANY,
     "none": NONE,
+    "for": FOR,
+    "in": IN,
   }
   outputStream.Write(lval.indent_level,yylex.Text()," ")
   return m[yylex.Text()]
