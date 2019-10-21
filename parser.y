@@ -68,6 +68,7 @@ pipeline_stmt: IMPORT package
   | DEF IDENT
   // NOTE: for other rules...
   | DEF IDENT '=' expr
+  | DEF IDENT '(' nop exprs nop ')' pipeline_block
   | expr '=' expr
   // NOTE: for other rules...
   | IDENT STRING
