@@ -88,7 +88,7 @@ pipeline_stmt: IMPORT package
   // NOTE: for other rules...
   | IDENT '(' expr ')' pipeline_block
   // NOTE: for other rules...
-  | IDENT '(' key_vals ')' pipeline_block
+  | IDENT '(' nop key_vals nop ')' pipeline_block
 
 pipeline_block : '{' pipeline_stmts '}'
 
@@ -123,13 +123,13 @@ expr: primary
     | '[' nop exprs nop ']'
     | '[' nop key_vals nop ']'
     // NOTE: duplicate rule but need for func()
-    | IDENT '(' exprs ')'
+    | IDENT '(' nop exprs nop ')'
     // func call
-    | expr '(' exprs ')'
-    | expr '(' key_vals ')'
-    | '(' key_vals ')'
+    | expr '(' nop exprs nop ')'
+    | expr '(' nop key_vals nop ')'
+    | '(' nop key_vals nop ')'
     | expr '.' IDENT
-    | NEW IDENT '(' exprs ')'
+    | NEW IDENT '(' nop exprs nop ')'
     | '-' expr %prec UNARY_OPERAND
     | expr '<' expr
     | expr '>' expr
