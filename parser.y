@@ -48,7 +48,7 @@ groovy_stmts: /* blank */
   | groovy_stmt_delimiter groovy_stmts
 
 nop: /* blank */
-   | nrs
+   | nop nrs
    // | COMMENT
 
 nrs: NR
