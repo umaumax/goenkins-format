@@ -23,7 +23,7 @@ package main
 %token SH ECHO
 %token AGENT LABEL STAGE NODE DIR SCRIPT ENVIRONMENT
 %token IMPORT
-%token IF ELSE FOR IN
+%token IF ELSE FOR IN TRY CATCH
 
 // NOTE: low priority
 %left OR
@@ -110,6 +110,7 @@ groovy_stmt: expr
   | IF expr groovy_block
   | IF expr groovy_block ELSE groovy_block
   | FOR '(' IDENT IN expr ')' groovy_block
+  | TRY groovy_block CATCH '(' IDENT IDENT ')' groovy_block
 
 groovy_block : '{' groovy_stmts '}'
 
