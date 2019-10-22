@@ -108,6 +108,7 @@ groovy_stmt: expr
   | ECHO expr
   // NOTE: for other rules...
   | IDENT expr
+  | SH expr
   | IF expr groovy_block
   | IF expr groovy_block ELSE groovy_block
   | FOR '(' IDENT IN expr ')' groovy_block
