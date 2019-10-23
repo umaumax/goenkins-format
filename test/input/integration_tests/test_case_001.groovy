@@ -55,6 +55,32 @@ try {
 }
 }
 
+pipeline {
+steps{
+dirs('tmp') {
+script {
+['a', 'b', 'c'].each { x ->
+try {
+} catch(Exception e) {
+}
+}
+}
+}
+}
+}
+
+pipeline {
+steps{
+dirs('tmp') {
+script {
+  for(i=0;i<10;i++) {
+
+  }
+}
+}
+}
+}
+
 def func(a, b, c) {
 stage('tmp') {
 parallel(

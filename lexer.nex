@@ -32,7 +32,7 @@
   return m[yylex.Text()]
 }
 
-/==|!=|>=|<=|\|\||&&/ {
+/==|!=|>=|<=|\|\||&&|\+\+|--|->/ {
   m := map[string]int{
     "==" : EQ,
     "!=" : NE,
@@ -40,6 +40,9 @@
     "<=" : LE,
     "||" : OR,
     "&&" : AND,
+    "++" : INCREMENT,
+    "--" : DECREMENT,
+    "->" : ARROW,
   }
   outputStream.Write(lval.indent_level,yylex.Text()," ")
   return m[yylex.Text()]
@@ -47,13 +50,16 @@
 
 /{|}/ {
   c := yylex.Text()[0]
-  if c == '{' {
-    lval.indent_level++
-  }
-  if c == '}' {
+  // NOTE: nex has bug of '｝' -> '｛' order
+  openFlag:= c == '{'
+  closeFlag:= c == '}'
+  if closeFlag {
     lval.indent_level--
   }
   outputStream.Write(lval.indent_level,yylex.Text()," ")
+  if openFlag {
+    lval.indent_level++
+  }
   return int(c)
 }
 
@@ -63,11 +69,11 @@
 }
 /[(.]|\[/ {
   c := yylex.Text()[0]
+  outputStream.TrimSpace()
+  outputStream.Write(lval.indent_level, yylex.Text())
   if c == '(' || c=='[' {
     lval.indent_level++
   }
-  outputStream.TrimSpace()
-  outputStream.Write(lval.indent_level, yylex.Text())
   return int(c)
 }
 /[:,]|\)|\]/ {
