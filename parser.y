@@ -42,10 +42,12 @@ package main
 %%
 
 pipeline_stmts: /* blank */
+  | pipeline_stmt
   | pipeline_stmt pipeline_stmt_delimiter pipeline_stmts
   | pipeline_stmt_delimiter pipeline_stmts
 
 groovy_stmts: /* blank */
+  | groovy_stmt
   | groovy_stmt groovy_stmt_delimiter groovy_stmts
   | groovy_stmt_delimiter groovy_stmts
 

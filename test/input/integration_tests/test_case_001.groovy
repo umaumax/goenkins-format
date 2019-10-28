@@ -90,3 +90,7 @@ c: c
 )
 }
 }
+
+pipeline {
+  agent {label "${params.label}"}
+}

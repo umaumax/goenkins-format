@@ -90,3 +90,7 @@ def func(a, b, c) {
     )
   }
 }
+
+pipeline {
+  agent { label "${params.label}" }
+}
