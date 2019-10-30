@@ -118,6 +118,9 @@ groovy_stmt: expr
   | FOR '(' IDENT IN expr ')' groovy_block
   | FOR '(' groovy_stmt ';' expr ';' expr ')' groovy_block
   | TRY groovy_block CATCH '(' IDENT IDENT ')' groovy_block
+  // NOTE: for other rules...
+  | DIR '(' expr ')' groovy_block
+  | IDENT '(' expr ')' groovy_block
   // NOTE: lambda
   | exprs ARROW nop groovy_stmt
   | expr groovy_block
@@ -136,6 +139,8 @@ key_vals: key_val
     | key_vals ',' nop key_val
 
 key_val: IDENT ':' expr
+    // NOTE: for exception
+    | SCRIPT ':' expr
 
 // NOTE: 式
 expr: primary
@@ -146,6 +151,8 @@ expr: primary
     | IDENT '(' nop exprs nop ')'
     // func call
     | expr '(' nop exprs nop ')'
+    // NOTE: for exception
+    | SH '(' nop key_vals nop ')'
     | expr '(' nop key_vals nop ')'
     | '(' nop key_vals nop ')'
     | expr '.' IDENT

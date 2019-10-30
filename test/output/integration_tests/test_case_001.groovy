@@ -94,3 +94,24 @@ def func(a, b, c) {
 pipeline {
   agent { label "${params.label}" }
 }
+
+pipeline {
+  post {
+    success {
+      script {
+        dir('xxx') {
+          def commit_id = sh(returnStdout: true, script: 'git rev-parse HEAD').trim()
+        }
+      }
+
+      script {
+        withEnv(['a=1', 'b=2']) {
+          echo "xxx"
+        }
+      }
+    }
+
+    failure {
+    }
+  }
+}
