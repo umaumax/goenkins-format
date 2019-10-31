@@ -13,7 +13,7 @@ function run_test() {
     output_filename=$(echo "$input_filename" | sed 's/input/output/g')
     tmp_output_filename="$output_filename.tmp.out"
     echo 1>&2 "# test of $input_filename"
-    cat "$input_filename" | ./goenkins-format >"$tmp_output_filename"
+    cat "$input_filename" | "$GOENKINS_FORMAT_CMD" >"$tmp_output_filename"
     exit_code=$?
 
     if [[ $exit_code == 0 ]]; then
@@ -45,6 +45,20 @@ function run_test() {
   fi
 }
 function main() {
+  if [[ -z $GOENKINS_FORMAT_CMD ]]; then
+    if [[ -f ./goenkins-format ]]; then
+      GOENKINS_FORMAT_CMD="./goenkins-format"
+    else
+      if type >/dev/null 2>&1 goenkins-format; then
+        GOENKINS_FORMAT_CMD="goenkins-format"
+      fi
+    fi
+  fi
+  if [[ -z $GOENKINS_FORMAT_CMD ]]; then
+    echo 1>&2 'not found goenkins-format command'
+    return 1
+  fi
+
   local target_dir=${1:-"test/input"}
   run_test "$target_dir"
 }
