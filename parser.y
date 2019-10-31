@@ -146,7 +146,9 @@ key_val: IDENT ':' expr
 expr: primary
     | key_vals
     | '[' nop exprs nop ']'
+    | '[' nop exprs ',' nop ']'
     | '[' nop key_vals nop ']'
+    | '[' nop key_vals ',' nop ']'
     // NOTE: duplicate rule but need for func()
     | IDENT '(' nop exprs nop ')'
     // func call

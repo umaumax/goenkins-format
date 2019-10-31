@@ -115,3 +115,14 @@ pipeline {
     }
   }
 }
+
+pipeline {
+  script {
+    def ary =[
+      'a',
+    ]
+    def dict =[
+      a: 'a',
+    ]
+  }
+}
