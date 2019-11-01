@@ -126,3 +126,15 @@ a:'a',
 ]
 }
 }
+
+pipeline {
+script {
+if (params.xxx == 'abc') {
+echo 'abc'
+} else if (params.xxx == 'def') {
+echo 'def'
+} else {
+echo 'xyz'
+}
+}
+}

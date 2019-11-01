@@ -101,6 +101,10 @@ pipeline_stmt: IMPORT package
 
 pipeline_block : '{' pipeline_stmts '}'
 
+if_stmt: IF expr groovy_block
+  | if_stmt ELSE groovy_block
+  | if_stmt ELSE if_stmt
+
 groovy_stmt: expr
   | groovy_block
   | DEF IDENT
@@ -113,8 +117,7 @@ groovy_stmt: expr
   // NOTE: for other rules...
   | IDENT expr
   | SH expr
-  | IF expr groovy_block
-  | IF expr groovy_block ELSE groovy_block
+  | if_stmt
   | FOR '(' IDENT IN expr ')' groovy_block
   | FOR '(' groovy_stmt ';' expr ';' expr ')' groovy_block
   | TRY groovy_block CATCH '(' IDENT IDENT ')' groovy_block
