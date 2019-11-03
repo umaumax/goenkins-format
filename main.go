@@ -11,10 +11,12 @@ import (
 
 var (
 	indentSapceNum int
+	overwritFlag   bool
 )
 
 func init() {
 	flag.IntVar(&indentSapceNum, "indent_num", 2, "number of spaces of indent")
+	flag.BoolVar(&overwritFlag, "i", false, "Inplace edit <file>s, if specified.")
 }
 
 var (
@@ -76,14 +78,52 @@ func main() {
 
 	outputStream.SetIndentSpaceNum(indentSapceNum)
 
-	lexer := LexerWrapper{Lexer: NewLexer(os.Stdin)}
-	if yyParse(lexer) != 0 {
-		log.Println(errors.New("hint fot error"))
+	// NOTE: default input file is input pipe
+	var inputFiles []string
+	if flag.NArg() == 0 {
+		inputFiles = append(inputFiles, os.Stdin.Name())
+	} else {
+		inputFiles = append(inputFiles, flag.Args()...)
+	}
+	completeNum := 0
+	totalNum := len(inputFiles)
+	for _, inputFile := range inputFiles {
+		file, err := os.OpenFile(inputFile, os.O_RDWR, 0666)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+		defer file.Close()
+
+		lexer := LexerWrapper{Lexer: NewLexer(file)}
+		if yyParse(lexer) != 0 {
+			log.Println(errors.New("hint fot error"))
+			outputStream.TrimSpace()
+			fmt.Fprintln(os.Stderr, "[", outputStream.output, "]")
+			continue
+		}
+
 		outputStream.TrimSpace()
-		fmt.Fprintln(os.Stderr, "[", outputStream.output, "]")
+
+		if overwritFlag {
+			if err := file.Truncate(0); err != nil {
+				log.Println("Truncate:", err)
+				continue
+			} else if _, err := file.Seek(0, 0); err != nil {
+				log.Println("Seek:", err)
+				continue
+			} else if _, err := fmt.Fprint(file, outputStream.output); err != nil {
+				log.Println("Write:", err)
+				continue
+			}
+		} else {
+			fmt.Print(outputStream.output)
+		}
+
+		completeNum++
+	}
+	if completeNum != totalNum {
+		fmt.Fprintf(os.Stderr, "failed processing (%d/%d)", totalNum-completeNum, totalNum)
 		os.Exit(1)
 	}
-
-	outputStream.TrimSpace()
-	fmt.Print(outputStream.output)
 }
