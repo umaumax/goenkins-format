@@ -29,6 +29,11 @@ type OutputStream struct {
 	indentSapceNum int
 }
 
+func (s *OutputStream) Truncate() {
+	s.output = ""
+	s.outputNewFlag = false
+}
+
 func (s *OutputStream) SetIndentSpaceNum(indentSapceNum int) {
 	s.indentSapceNum = indentSapceNum
 }
@@ -95,6 +100,7 @@ func main() {
 		}
 		defer file.Close()
 
+		outputStream.Truncate()
 		lexer := LexerWrapper{Lexer: NewLexer(file)}
 		if yyParse(lexer) != 0 {
 			log.Println(errors.New("hint fot error"))
