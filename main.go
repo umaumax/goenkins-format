@@ -16,7 +16,7 @@ var (
 
 func init() {
 	flag.IntVar(&indentSapceNum, "indent_num", 2, "number of spaces of indent")
-	flag.BoolVar(&overwritFlag, "i", false, "Inplace edit <file>s, if specified.")
+	flag.BoolVar(&overwritFlag, "i", false, "Inplace edit <file>s, if specified. Don't use at /dev/stdin")
 }
 
 var (
@@ -84,21 +84,22 @@ func main() {
 	outputStream.SetIndentSpaceNum(indentSapceNum)
 
 	// NOTE: default input file is input pipe
-	var inputFiles []string
-	if flag.NArg() == 0 {
-		inputFiles = append(inputFiles, os.Stdin.Name())
-	} else {
-		inputFiles = append(inputFiles, flag.Args()...)
+	inputFiles := []string{"-"}
+	if flag.NArg() > 0 {
+		inputFiles = flag.Args()
 	}
 	completeNum := 0
 	totalNum := len(inputFiles)
 	for _, inputFile := range inputFiles {
-		file, err := os.OpenFile(inputFile, os.O_RDWR, 0666)
-		if err != nil {
-			log.Println(err)
-			continue
+		file := os.Stdin
+		if inputFile != "-" {
+			file, err := os.OpenFile(inputFile, os.O_RDWR, 0666)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			defer file.Close()
 		}
-		defer file.Close()
 
 		outputStream.Truncate()
 		lexer := LexerWrapper{Lexer: NewLexer(file)}
